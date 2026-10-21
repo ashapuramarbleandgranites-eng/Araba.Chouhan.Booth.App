@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ग्राम पंचायत अराबा चौहान - बूथ मैनेजमेंट ऐप</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans pb-20">
+    <!-- Top Header -->
+    <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold">अराबा चौहान - बूथ ऐप</h1>
+                <p class="text-xs text-blue-200">जिला बालोतरा | सरपंच प्रत्याशी: कुंवर हनवंतसिंह अराबा</p>
+            </div>
+            <div>
+                <span class="bg-green-600 text-xs px-3 py-1.5 rounded font-semibold shadow inline-block">
+                    <i class="fa-solid fa-check-circle"></i> सातों वार्ड लाइव
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto p-3">
+        <!-- Search & Filters -->
+        <div class="bg-white p-3 rounded-lg shadow mb-3">
+            <div class="relative mb-2">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterVoters()" placeholder="मतदाता का नाम या पिता का नाम लिखें..." class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+            <div class="flex gap-2">
+                <select id="wardFilter" onchange="filterVoters()" class="w-1/2 p-2 border rounded-lg text-sm bg-gray-50">
+                    <option value="">सभी वार्ड (1 से 7)</option>
+                    <option value="1">वार्ड 1</option>
+                    <option value="2">वार्ड 2</option>
+                    <option value="3">वार्ड 3</option>
+                    <option value="4">वार्ड 4</option>
+                    <option value="5">वार्ड 5</option>
+                    <option value="6">वार्ड 6</option>
+                    <option value="7">वार्ड 7</option>
+                </select>
+                <select id="ageFilter" onchange="filterVoters()" class="w-1/2 p-2 border rounded-lg text-sm bg-gray-50">
+                    <option value="">सभी आयु</option>
+                    <option value="young">युवा (18-25 वर्ष)</option>
+                    <option value="old">वृद्ध (60+ वर्ष)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Voter Count Bar -->
+        <div class="flex justify-between items-center mb-2 px-1 text-xs text-gray-600 font-medium">
+            <span id="voterCount">कुल मतदाता: लोड हो रहा है...</span>
+            <span class="text-blue-600 font-bold">अराबा चौहान पंचायत</span>
+        </div>
+
+        <!-- Voter List -->
+        <div id="voterList" class="space-y-2">
+            <!-- डायनेमिक लिस्ट यहाँ लोड होगी -->
+        </div>
+    </main>
+
+    <!-- Voter Slip Modal -->
+    <div id="slipModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-xl overflow-hidden shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center font-bold text-gray-700 z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Banner Preview -->
+            <div class="bg-gradient-to-r from-amber-500 to-red-600 text-white p-3 text-center">
+                <p class="text-xs uppercase tracking-wider font-semibold">ग्राम पंचायत अराबा चौहान - सरपंच पद हेतु</p>
+                <h3 class="text-base font-bold">समर्थक: कुंवर हनवंतसिंह अराबा</h3>
+                <p class="text-xs bg-white/20 inline-block px-2 py-0.5 rounded mt-1">अमूल्य वोट देकर विजयी बनाएं</p>
+            </div>
+
+            <!-- Voter Details Slip -->
+            <div class="p-4 bg-yellow-50/50 text-sm space-y-2 border-b">
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">वार्ड क्र.:</span><span id="modalWard" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">क्रम संख्या:</span><span id="modalSerial" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">मतदाता का नाम:</span><span id="modalName" class="font-bold text-blue-700 text-base"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">पिता/पति का नाम:</span><span id="modalFather" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">उम्र / लिंग:</span><span id="modalAgeGender" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">मकान नंबर:</span><span id="modalHouse" class="font-bold text-gray-800"></span></div>
+                <div class="flex justify-between border-b pb-1"><span class="text-gray-500">वोटर आईडी (EPIC):</span><span id="modalEpic" class="font-mono font-bold text-gray-800"></span></div>
+                <div class="flex justify-between"><span class="text-gray-500">मतदान बूथ:</span><span id="modalBooth" class="text-xs font-semibold text-gray-700"></span></div>
+            </div>
+
+            <!-- Communication Actions (WhatsApp, Normal SMS, Direct Call) -->
+            <div class="p-4 bg-white space-y-2">
+                <input type="text" id="whatsappNumber" placeholder="मतदाता का मोबाइल नंबर (10 अंक)" class="w-full p-2 border rounded text-sm mb-1 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="sendWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-bold text-xs shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp
+                    </button>
+                    <button onclick="sendNormalSMS()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-xs shadow flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-comment-sms text-base"></i> नॉर्मल SMS
+                    </button>
+                </div>
+                
+                <button onclick="makeDirectCall()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg font-bold text-xs shadow flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-phone-volume text-base"></i> सीधे कॉल करें (Direct Call)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        let currentVoter = null;
+
+        // सातों वार्डों का संपूर्ण वास्तविक डेटा (वार्ड 1 से 7)
+        const votersData = [
+            // वार्ड 1 के मतदाता (नमूना एवं मुख्य सूची)
+            { ward: "1", serial: "1", name: "विक्रम दास", father: "नामग्न दास", age: 30, gender: "पुरुष", house: "05", epic: "SSB1585462", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "1", serial: "2", name: "पूंजराज सिंह", father: "बहादुर सिंह", age: 22, gender: "पुरुष", house: "13", epic: "SSB1421676", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "1", serial: "3", name: "अभिमन्यु सिंह", father: "भंवर सिंह", age: 25, gender: "पुरुष", house: "17", epic: "SSB1261429", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "1", serial: "10", name: "कमला", father: "जबर दास", age: 65, gender: "स्त्री", house: "01", epic: "RJ/23/176/693078", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            
+            // वार्ड 2 के मतदाता
+            { ward: "2", serial: "1", name: "गुलाब सिंह", father: "किशोर सिंह", age: 72, gender: "पुरुष", house: "86", epic: "RJ/23/176/693183", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "2", serial: "2", name: "मदन कंवर", father: "गुलाब सिंह", age: 41, gender: "पुरुष", house: "86", epic: "RJ/23/176/693235", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "2", serial: "25", name: "विक्रम", father: "कुम्पा राम पटेल", age: 20, gender: "पुरुष", house: "89", epic: "SSB1840412", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+
+            // वार्ड 3 के मतदाता
+            { ward: "3", serial: "1", name: "सायर देवी", father: "चतुर्भुज सोनी", age: 47, gender: "स्त्री", house: "35", epic: "SSB1135078", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "3", serial: "2", name: "लक्ष्मी सोनी", father: "चतुर्भुज सोनी", age: 46, gender: "पुरुष", house: "38", epic: "SSB1134998", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+
+            // वार्ड 4 के मतदाता
+            { ward: "4", serial: "1", name: "खीम कंवर", father: "इन्द्र सिंह", age: 81, gender: "स्त्री", house: "113", epic: "RJ/23/176/693573", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" },
+            { ward: "4", serial: "2", name: "लक्ष्मण सिंह", father: "इन्द्र सिंह", age: 62, gender: "पुरुष", house: "113", epic: "GKV1733070", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" },
+
+            // वार्ड 5 के मतदाता
+            { ward: "5", serial: "1", name: "गुड्डी कंवर", father: "लक्ष्मण सिंह", age: 26, gender: "स्त्री", house: "11", epic: "SSB1390848", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+            { ward: "5", serial: "2", name: "देवेंद्र सिंह", father: "भेरू सिंह", age: 23, gender: "पुरुष", house: "11", epic: "SSB1390913", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 01" },
+
+            // वार्ड 6 के मतदाता
+            { ward: "6", serial: "1", name: "इन्द्रा", father: "हेमाराम", age: 73, gender: "स्त्री", house: "01", epic: "RJ/23/176/693654", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" },
+            { ward: "6", serial: "2", name: "सूजाराम", father: "हेमाराम", age: 51, gender: "पुरुष", house: "01", epic: "RJ/23/176/693655", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" },
+
+            // वार्ड 7 के मतदाता
+            { ward: "7", serial: "1", name: "मोरी", father: "जगमालराम", age: 68, gender: "स्त्री", house: "01", epic: "RJ/23/176/693225", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" },
+            { ward: "7", serial: "2", name: "हीराराम", father: "जगमालराम", age: 47, gender: "पुरुष", house: "01", epic: "GKV1732981", booth: "रा.उ.मा.वि. अराबा कमरा नंबर 02" }
+        ];
+
+        function renderVoters(data) {
+            const listContainer = document.getElementById('voterList');
+            document.getElementById('voterCount').innerText = `कुल मतदाता मिले: ${data.length}`;
+            
+            if (data.length === 0) {
+                listContainer.innerHTML = `<div class="bg-white p-6 text-center rounded-lg text-gray-500 text-sm">कोई मतदाता नहीं मिला। सही नाम या वार्ड चुनें।</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = data.map((v) => `
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center hover:bg-blue-50/50 transition">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded font-bold">वार्ड ${v.ward}</span>
+                            <span class="text-xs text-gray-500">क्र.सं: ${v.serial}</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-sm mt-1">${v.name} <span class="text-xs font-normal text-gray-600">(${v.father})</span></h4>
+                        <p class="text-xs text-gray-500">आयु: ${v.age} वर्ष | लिंग: ${v.gender} | मकान: ${v.house}</p>
+                    </div>
+                    <button onclick='openSlip(${JSON.stringify(v)})' class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow flex items-center gap-1">
+                        <i class="fa-solid fa-id-card"></i> पर्ची
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterVoters() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const selectedWard = document.getElementById('wardFilter').value;
+            const selectedAge = document.getElementById('ageFilter').value;
+
+            let filtered = votersData.filter(v => {
+                const matchName = v.name.toLowerCase().includes(keyword) || v.father.toLowerCase().includes(keyword);
+                const matchWard = selectedWard === "" || v.ward === selectedWard;
+                let matchAge = true;
+                if (selectedAge === 'young') matchAge = v.age >= 18 && v.age <= 25;
+                if (selectedAge === 'old') matchAge = v.age >= 60;
+                return matchName && matchWard && matchAge;
+            });
+
+            renderVoters(filtered);
+        }
+
+        function openSlip(voter) {
+            currentVoter = voter;
+            document.getElementById('modalWard').innerText = voter.ward;
+            document.getElementById('modalSerial').innerText = voter.serial;
+            document.getElementById('modalName').innerText = voter.name;
+            document.getElementById('modalFather').innerText = voter.father;
+            document.getElementById('modalAgeGender').innerText = `${voter.age} वर्ष (${voter.gender})`;
+            document.getElementById('modalHouse').innerText = voter.house;
+            document.getElementById('modalEpic').innerText = voter.epic;
+            document.getElementById('modalBooth').innerText = voter.booth;
+            document.getElementById('slipModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('slipModal').classList.add('hidden');
+        }
+
+        function getMessageText() {
+            return `नमस्कार ${currentVoter.name} जी, ग्राम पंचायत अराबा चौहान - सरपंच पद हेतु प्रत्याशी कुंवर हनवंतसिंह अराबा के समर्थन में अपना अमूल्य वोट दें। वार्ड: ${currentVoter.ward}, क्र.सं: ${currentVoter.serial}, बूथ: ${currentVoter.booth}`;
+        }
+
+        function sendWhatsApp() {
+            const phone = document.getElementById('whatsappNumber').value.trim();
+            if(!phone || phone.length < 10) {
+                alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!');
+                return;
+            }
+            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(getMessageText())}`, '_blank');
+        }
+
+        function sendNormalSMS() {
+            const phone = document.getElementById('whatsappNumber').value.trim();
+            if(!phone || phone.length < 10) {
+                alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!');
+                return;
+            }
+            window.location.href = `sms:${phone}?body=${encodeURIComponent(getMessageText())}`;
+        }
+
+        function makeDirectCall() {
+            const phone = document.getElementById('whatsappNumber').value.trim();
+            if(!phone || phone.length < 10) {
+                alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!');
+                return;
+            }
+            window.location.href = `tel:${phone}`;
+        }
+
+        // शुरुआत में सभी वोटर लोड करें
+        renderVoters(votersData);
+    </script>
+</body>
+</html>
